@@ -15,9 +15,9 @@ export const Content = () => {
           prev: `#slide${idx === 0 ? data.length : idx}`,
           next: `#slide${idx === data.length - 1 ? 1 : idx + 2}`,
         }));
-        console.log("🚀 ~ fetchProduct ~ _data:", _data);
         setProducts(_data);
       }
+      console.log("🚀 ~ fetchProduct ~ data:", data);
       return;
     } catch (error) {
       console.log("🚀 ~ fetchProduct ~ error:", error);
