@@ -1,11 +1,11 @@
 interface IProduct {
-  id: number;
+  id?: number;
   name: string;
   price: number;
   description: string;
-  image: string;
-  created_at: Date;
-  updated_at: Date;
+  image: File | string | null;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 interface IProductWithslide extends IProduct {
@@ -14,9 +14,3 @@ interface IProductWithslide extends IProduct {
 }
 
 export type { IProduct, IProductWithslide };
-export interface product {
-  name: string;
-  price: number;
-  description: string;
-  image: File | string | null;
-}
