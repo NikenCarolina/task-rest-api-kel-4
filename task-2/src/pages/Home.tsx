@@ -1,27 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
+import CreateProductForm from "../components/CreateProductForm";
 
 const Home = () => {
+  const [open, setOpen] = useState(false);
   return (
     <>
       {/* Open the modal using document.getElementById('ID').showModal() method */}
-      <button
-        className="btn"
-        onClick={() => document.getElementById("my_modal_1").showModal()}
-      >
+      <label htmlFor="my_modal_1" className="btn">
         open modal
-      </button>
+      </label>
+      <input
+        type="checkbox"
+        id="my_modal_1"
+        className="modal-toggle"
+        checked={open}
+        onChange={() => setOpen(!open)}
+      />
+
       <dialog id="my_modal_1" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Hello!</h3>
-          <p className="py-4">
-            Press ESC key or click the button below to close
-          </p>
-          <div className="modal-action">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn">Close</button>
-            </form>
-          </div>
+        <div className="modal-box min-w-3/4">
+          <CreateProductForm callback={() => setOpen(false)} />
         </div>
       </dialog>
     </>
