@@ -14,3 +14,9 @@ interface IProductWithslide extends IProduct {
 }
 
 export type { IProduct, IProductWithslide };
+export interface product {
+  name: string;
+  price: number;
+  description: string;
+  image: File | string | null;
+}
