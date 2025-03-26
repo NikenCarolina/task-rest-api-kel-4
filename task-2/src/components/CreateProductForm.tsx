@@ -1,13 +1,14 @@
-import axios, { AxiosError } from "axios";
-import { Api } from "../constants";
-import { useState } from "react";
-import { product } from "../interfaces/product";
+import { AxiosError } from "axios";
+import { useRef, useState } from "react";
+import { IProduct } from "../interfaces/product";
 import Swal from "sweetalert2";
+import axiosInstance from "../utils/axios";
 
-const CreateProductForm: React.FC<{ callback: () => void }> = ({
-  callback,
-}) => {
-  const [product, setProduct] = useState<product>({
+const CreateProductForm: React.FC<{
+  callback: (isCreated: boolean) => void;
+}> = ({ callback }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [product, setProduct] = useState<IProduct>({
     name: "",
     price: 0,
     description: "",
@@ -52,7 +53,7 @@ const CreateProductForm: React.FC<{ callback: () => void }> = ({
       });
       if (createResult.isConfirmed) {
         setProductError(null);
-        await axios.post(`${Api}/products`, formData, {
+        await axiosInstance.post("/products", formData, {
           headers: {
             contentType: "multipart/form-data",
           },
@@ -63,7 +64,7 @@ const CreateProductForm: React.FC<{ callback: () => void }> = ({
           icon: "success",
         });
         if (result.isConfirmed) {
-          callback();
+          callback(true);
         }
       }
     } catch (e) {
@@ -149,6 +150,7 @@ const CreateProductForm: React.FC<{ callback: () => void }> = ({
               type="file"
               className="file-input w-full"
               onChange={handleFileChange}
+              ref={fileInputRef}
             />
             <label className="fieldset-label">Max size 2MB</label>
             {productError?.image && (
@@ -180,7 +182,8 @@ const CreateProductForm: React.FC<{ callback: () => void }> = ({
             });
             setPreview(null);
             setProductError(null);
-            callback();
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            callback(false);
           }}
         >
           Close

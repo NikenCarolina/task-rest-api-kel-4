@@ -9,7 +9,7 @@ const Home = () => {
   const fetchProduct = async () => {
     try {
       const res = await axiosInstance.get("/products");
-      const data = res?.data;
+      const data = res?.data.data;
       if (data) {
         const _data = data.map((el: IProduct, idx: number) => ({
           ...el,
@@ -28,7 +28,7 @@ const Home = () => {
 
   const handleDelete = async (productId: number) => {
     try {
-      await axiosInstance.delete("/api/products/" + productId);
+      await axiosInstance.delete("/products/" + productId);
       setProducts((prevProducts) =>
         prevProducts.filter((product: IProduct) => product.id !== productId)
       );
@@ -44,9 +44,8 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   return (
     <>
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
-      <label htmlFor="my_modal_1" className="btn">
-        open modal
+      <label htmlFor="my_modal_1" className="btn absolute m-3 right-0">
+        Create Product
       </label>
       <input
         type="checkbox"
@@ -58,7 +57,12 @@ const Home = () => {
 
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box min-w-3/4">
-          <CreateProductForm callback={() => setOpen(false)} />
+          <CreateProductForm
+            callback={(isCreated) => {
+              setOpen(false);
+              if (isCreated) fetchProduct();
+            }}
+          />
         </div>
       </dialog>
 
@@ -131,7 +135,7 @@ const Home = () => {
                     </button>
                     <button
                       className="btn btn-error btn-md px-6 py-3 w-[47%]"
-                      onClick={() => handleDelete(product.id)}
+                      onClick={() => handleDelete(product.id!)}
                     >
                       Delete
                     </button>
