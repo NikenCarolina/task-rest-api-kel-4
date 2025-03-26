@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
 import axiosInstance from "../utils/axios";
 import { IProduct } from "../interfaces/product";
+import Swal from "sweetalert2";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(null);
 
-  const fetchProduct = async () => {
+  const fetchProduct = async (page: number = currentPage) => {
     try {
-      const res = await axiosInstance.get("/products");
-      console.log("🚀 ~ fetchProduct ~ res:", res);
-      const data = res?.data?.data;
+      const res = await axiosInstance.get(`/products?page=${page}`);
+      const data = res?.data.data;
       if (data) {
         const _data = data?.map((el: IProduct, idx: number) => ({
           ...el,
@@ -19,6 +20,8 @@ const Home = () => {
           next: `#slide${idx === data.length - 1 ? 1 : idx + 2}`,
         }));
         setProducts(_data);
+        setCurrentPage(res?.data?.current_page);
+        setTotalPage(res?.data?.last_page);
       }
       return;
     } catch (error) {
@@ -28,11 +31,34 @@ const Home = () => {
 
   const handleDelete = async (productId: number) => {
     try {
-      await axiosInstance.delete("products/" + productId);
-      fetchProduct();
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await axiosInstance.delete("/products/" + productId);
+          fetchProduct(currentPage);
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      });
     } catch (error) {
       console.log("🚀 ~ handleDelete ~ error:", error);
     }
+  };
+
+  const handlePaginate = (page: number) => {
+    setCurrentPage(page);
+    fetchProduct(page);
   };
 
   useEffect(() => {
@@ -42,9 +68,8 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   return (
     <>
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
-      <label htmlFor="my_modal_1" className="btn">
-        open modal
+      <label htmlFor="my_modal_1" className="btn absolute m-3 right-0">
+        Create Product
       </label>
       <input
         type="checkbox"
@@ -56,7 +81,12 @@ const Home = () => {
 
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box min-w-3/4">
-          <CreateProductForm callback={() => setOpen(false)} />
+          <CreateProductForm
+            callback={(isCreated) => {
+              setOpen(false);
+              if (isCreated) fetchProduct();
+            }}
+          />
         </div>
       </dialog>
 
@@ -129,7 +159,7 @@ const Home = () => {
                     </button>
                     <button
                       className="btn btn-error btn-md px-6 py-3 w-[47%]"
-                      onClick={() => handleDelete(product.id)}
+                      onClick={() => handleDelete(product.id!)}
                     >
                       Delete
                     </button>
@@ -140,10 +170,20 @@ const Home = () => {
         </div>
       </div>
       <div className="join">
-        <button className="join-item btn">1</button>
-        <button className="join-item btn btn-active">2</button>
-        <button className="join-item btn">3</button>
-        <button className="join-item btn">4</button>
+        {totalPage &&
+          Array.from({ length: totalPage }).map((_, index) => (
+            <button
+              key={index}
+              className={`join-item btn btn-md ${
+                index + 1 === currentPage
+                  ? "btn-primary text-white font-bold"
+                  : ""
+              }`}
+              onClick={() => handlePaginate(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
       </div>
     </>
   );
