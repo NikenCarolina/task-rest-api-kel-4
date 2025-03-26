@@ -1,37 +1,35 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
 import axiosInstance from "../utils/axios";
 import { IProduct } from "../interfaces/product";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(null);
 
   const fetchProduct = async () => {
     try {
       const res = await axiosInstance.get("/products");
-      const data = res?.data;
+      console.log("🚀 ~ fetchProduct ~ res:", res);
+      const data = res?.data?.data;
       if (data) {
-        const _data = data.map((el: IProduct, idx: number) => ({
+        const _data = data?.map((el: IProduct, idx: number) => ({
           ...el,
           prev: `#slide${idx === 0 ? data.length : idx}`,
           next: `#slide${idx === data.length - 1 ? 1 : idx + 2}`,
         }));
-        console.log("🚀 ~ fetchProduct ~ _data:", _data);
         setProducts(_data);
       }
       return;
     } catch (error) {
-      console.log("🚀 ~ fetchProduct ~ error:", error);
       return;
     }
   };
 
   const handleDelete = async (productId: number) => {
     try {
-      await axiosInstance.delete("/api/products/" + productId);
-      setProducts((prevProducts) =>
-        prevProducts.filter((product: IProduct) => product.id !== productId)
-      );
+      await axiosInstance.delete("products/" + productId);
+      fetchProduct();
     } catch (error) {
       console.log("🚀 ~ handleDelete ~ error:", error);
     }
@@ -140,6 +138,12 @@ const Home = () => {
               </div>
             ))}
         </div>
+      </div>
+      <div className="join">
+        <button className="join-item btn">1</button>
+        <button className="join-item btn btn-active">2</button>
+        <button className="join-item btn">3</button>
+        <button className="join-item btn">4</button>
       </div>
     </>
   );
