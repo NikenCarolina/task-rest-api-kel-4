@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
 import axiosInstance from "../utils/axios";
 import { IProduct } from "../interfaces/product";
+import EditProductForm from "../components/EditProductForm";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
+  const [editProductId, setEditProductId] = useState(-1);
 
   const fetchProduct = async () => {
     try {
@@ -42,6 +44,8 @@ const Home = () => {
   }, []);
 
   const [open, setOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+
   return (
     <>
       <label htmlFor="my_modal_1" className="btn absolute m-3 right-0">
@@ -130,9 +134,20 @@ const Home = () => {
                     {product.description}
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
-                    <button className="btn btn-accent btn-md px-6 py-3 w-[47%]">
+                    <label htmlFor="my_modal_2" className="btn">
                       Edit
-                    </button>
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="my_modal_2"
+                      className="modal-toggle"
+                      checked={openUpdate}
+                      onChange={() => {
+                        setOpenUpdate(!openUpdate);
+                        console.log(openUpdate, product.id);
+                        setEditProductId(product.id!);
+                      }}
+                    />
                     <button
                       className="btn btn-error btn-md px-6 py-3 w-[47%]"
                       onClick={() => handleDelete(product.id!)}
@@ -145,6 +160,18 @@ const Home = () => {
             ))}
         </div>
       </div>
+
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box min-w-3/4">
+          <EditProductForm
+            callback={(isCreated) => {
+              setOpen(false);
+              if (isCreated) fetchProduct();
+            }}
+            id={editProductId}
+          />
+        </div>
+      </dialog>
     </>
   );
 };
