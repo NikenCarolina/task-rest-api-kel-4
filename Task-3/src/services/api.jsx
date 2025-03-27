@@ -23,8 +23,9 @@ const getBalanceInquiry = async () => {
     const signatureAuthResponse = await API.post(
       "/api/v1.0/utilities/signature-auth"
     );
-    if (!signatureAuthResponse.data.signature)
+    if (!signatureAuthResponse.data.signature) {
       throw new Error("Signature not found");
+    }
     headers["X-SIGNATURE"] = signatureAuthResponse.data.signature;
 
     // Step 2: Get Access Token
@@ -36,8 +37,9 @@ const getBalanceInquiry = async () => {
       },
       { headers }
     );
-    if (!tokenResponse.data.accessToken)
+    if (!tokenResponse.data.accessToken) {
       throw new Error("Access token not found");
+    }
     headers.Authorization = `Bearer ${tokenResponse.data.accessToken}`;
     headers.AccessToken = tokenResponse.data.accessToken;
 
@@ -53,11 +55,12 @@ const getBalanceInquiry = async () => {
       },
       { headers }
     );
-    if (!signatureServiceResponse.data.signature)
+    if (!signatureServiceResponse.data.signature) {
       throw new Error("Signature not found");
+    }
     headers["X-SIGNATURE"] = signatureServiceResponse.data.signature;
 
-    // Step 4: Perform Balance Inquiry
+    // Step 4: Get Balance Inquiry
     const balanceInquiryResponse = await API.post(
       "/api/v1.0/balance-inquiry",
       {
