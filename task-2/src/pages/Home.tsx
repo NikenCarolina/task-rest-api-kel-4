@@ -99,13 +99,6 @@ const Home = () => {
 
   return (
     <>
-      <label
-        htmlFor={constants.CreateModalId}
-        className="btn absolute m-3 right-0"
-      >
-        Create Product
-      </label>
-
       <input
         type="checkbox"
         id={constants.CreateModalId}
@@ -125,13 +118,23 @@ const Home = () => {
         </div>
       </dialog>
 
+      {/* <div className="w-full flex justify-end">
+        <label htmlFor={constants.CreateModalId} className="btn m-3 right-0">
+          Create Product
+        </label>
+      </div> */}
       <div
-        className="hero min-h-screen"
+        className="min-h-screen"
         style={{
           backgroundImage:
             "url(https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
         }}
       >
+        <div className="w-full flex justify-end">
+          <label htmlFor={constants.CreateModalId} className="btn m-3 right-0">
+            Create Product
+          </label>
+        </div>
         <div className="container-lg flex justify-center flex-wrap gap-4">
           {products &&
             products.map((product: IProduct) => (
@@ -176,7 +179,7 @@ const Home = () => {
                         setOpenUpdate(!openUpdate);
                         document
                           .getElementById(constants.UpdateModalId)!
-                          .showModal();
+                          ?.showModal();
                       }}
                     >
                       Edit
