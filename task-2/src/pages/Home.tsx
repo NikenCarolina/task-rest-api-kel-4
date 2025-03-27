@@ -158,7 +158,7 @@ const Home = () => {
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
                     <button
-                      className="btn"
+                      className="btn btn-accent btn-md px-6 py-3 w-[47%]"
                       onClick={() => {
                         setEditProductId(product.id!);
                         setOpenUpdate(!openUpdate);
