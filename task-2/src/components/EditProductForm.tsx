@@ -57,6 +57,7 @@ const EditProductForm: React.FC<{
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes!",
         target: document.getElementById(constants.UpdateModalId),
+        scrollbarPadding: false,
       });
       if (updateResult.isDismissed) {
         setSubmitLoading(false);
@@ -74,6 +75,7 @@ const EditProductForm: React.FC<{
           text: "Your product has been created.",
           icon: "success",
           target: document.getElementById(constants.UpdateModalId),
+          scrollbarPadding: false,
         });
         if (result.isDismissed || result.isConfirmed) {
           setSubmitLoading(false);
@@ -102,6 +104,8 @@ const EditProductForm: React.FC<{
           title: "Error!",
           text: "Failed to delete product",
           icon: "error",
+          target: document.getElementById(constants.UpdateModalId),
+          scrollbarPadding: false,
         });
         setSubmitLoading(false);
       }
