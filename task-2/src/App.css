@@ -1,2 +1,15 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+:root[class^=swal2] div:where(.swal2-container) div:where(.swal2-popup) {
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    z-index: 1;
+}
+
+
+:root[class^=swal2] div:where(.swal2-success) > *:not(.swal2-success-line-tip, .swal2-success-line-long, .swal2-success-ring) {
+    background-color: var(--color-base-100) !important;
+    color: var(--color-base-content);
+    z-index: 1;
+}

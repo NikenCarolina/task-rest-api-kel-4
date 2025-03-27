@@ -87,7 +87,9 @@ const Home = () => {
   };
 
   const handleModalUpdate = (isCreated: boolean) => {
-    document.getElementById(constants.UpdateModalId)!.close();
+    (
+      document.getElementById(constants.UpdateModalId)! as HTMLDialogElement
+    ).close();
     if (isCreated) fetchProduct();
     setOpenUpdate(false);
   };
@@ -183,9 +185,11 @@ const Home = () => {
                       onClick={() => {
                         setEditProductId(product.id!);
                         setOpenUpdate(!openUpdate);
-                        document
-                          .getElementById(constants.UpdateModalId)!
-                          ?.showModal();
+                        (
+                          document.getElementById(
+                            constants.UpdateModalId
+                          )! as HTMLDialogElement
+                        ).showModal();
                       }}
                     >
                       Edit
