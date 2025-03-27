@@ -65,7 +65,6 @@ const Home = () => {
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
-        reverseButtons: true,
       }).then(async (result) => {
         if (result.isConfirmed) {
           await axiosInstance.delete("/products/" + productId);
@@ -165,11 +164,17 @@ const Home = () => {
                   )}
                 </figure>
                 <div className="card-body p-6">
-                  <h2 className="card-title text-lg font-semibold text-gray-800">
+                  <h1 className="card-title text-lg font-semibold text-gray-800">
                     {product.name}
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-2">
+                  </h1>
+                  <p className="text-gray-600 text-sm mt-2 italic">
                     {product.description}
+                  </p>
+                  <p className="text-black text-sm mt-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(product?.price || 0)}
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
                     <button
@@ -238,7 +243,10 @@ const Home = () => {
                 />
               )}
               <small className="font-bold text-lg text-gray-700 mt-4">
-                Rp. {currentProduct?.price.toFixed(2)}
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(currentProduct?.price || 0)}
               </small>
             </div>
           )}
