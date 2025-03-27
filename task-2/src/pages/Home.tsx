@@ -108,7 +108,7 @@ const Home = () => {
       />
 
       <dialog id={constants.CreateModalId} className="modal">
-        <div className="modal-box min-w-3/4">
+        <div className="modal-box w-full max-w-3xl p-6 sm:p-8">
           <CreateProductForm
             callback={(isCreated) => {
               setOpen(false);
@@ -213,7 +213,7 @@ const Home = () => {
           ))}
       </div>
       <dialog id={constants.UpdateModalId} className="modal">
-        <div className="modal-box">
+        <div className="modal-box w-full max-w-3xl p-6 sm:p-8">
           {openUpdate && (
             <EditProductForm callback={handleModalUpdate} id={editProductId} />
           )}
