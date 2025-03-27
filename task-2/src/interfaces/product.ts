@@ -13,4 +13,9 @@ interface IProductWithslide extends IProduct {
   next: string;
 }
 
-export type { IProduct, IProductWithslide };
+interface IPreviewProduct {
+  image: string;
+  price: number;
+}
+
+export type { IProduct, IProductWithslide, IPreviewProduct };

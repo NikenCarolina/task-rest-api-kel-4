@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
 import axiosInstance from "../utils/axios";
-import { IProduct } from "../interfaces/product";
+import { IPreviewProduct, IProduct } from "../interfaces/product";
 import Swal from "sweetalert2";
+import EditProductForm from "../components/EditProductForm";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(null);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [editProductId, setEditProductId] = useState(-1);
+  const [currentProduct, setCurrentProduct] = useState<IPreviewProduct | null>(
+    null
+  );
 
   const fetchProduct = async (page: number = currentPage) => {
     try {
@@ -27,6 +32,17 @@ const Home = () => {
     } catch (error) {
       return;
     }
+  };
+
+  const previewProduct = (productImg: string, price: number) => {
+    (
+      document?.getElementById("modalPreview") as HTMLDialogElement
+    )?.showModal();
+    const previewProperty = {
+      image: productImg,
+      price: price,
+    };
+    setCurrentProduct(previewProperty);
   };
 
   const handleDelete = async (productId: number) => {
@@ -61,16 +77,24 @@ const Home = () => {
     fetchProduct(page);
   };
 
+  const handleModalUpdate = (id: number) => {
+    setOpenUpdate(!openUpdate);
+    setEditProductId(id!);
+  };
+
   useEffect(() => {
     fetchProduct();
   }, []);
 
   const [open, setOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+
   return (
     <>
       <label htmlFor="my_modal_1" className="btn absolute m-3 right-0">
         Create Product
       </label>
+
       <input
         type="checkbox"
         id="my_modal_1"
@@ -97,41 +121,6 @@ const Home = () => {
             "url(https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
         }}
       >
-        <div className="hero-overlay"></div>
-        {/* <div className="hero-content text-neutral-content text-center">
-              <div className="w-full max-w-4xl mx-auto">
-                <h1 className="mb-5 text-5xl font-bold text-white">Our Product</h1>
-                <div className="carousel w-full rounded-lg overflow-hidden shadow-lg">
-                  {products.map((product: IProductWithslide, idx: number) => (
-                    <div
-                      key={product.id}
-                      id={"slide" + idx}
-                      className="carousel-item relative w-full h-100"
-                    >
-                      <img
-                        src={`http://127.0.0.1:8000/assets/images/${product.image}`}
-                        alt={`Slide ${product.id}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                        <a
-                          href={product.prev}
-                          className="btn btn-circle bg-white text-black hover:bg-gray-200"
-                        >
-                          ❮
-                        </a>
-                        <a
-                          href={product.next}
-                          className="btn btn-circle bg-white text-black hover:bg-gray-200"
-                        >
-                          ❯
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div> */}
         <div className="container-lg flex justify-center flex-wrap gap-4">
           {products &&
             products.map((product: IProduct) => (
@@ -139,7 +128,12 @@ const Home = () => {
                 key={product.id}
                 className="card bg-white w-96 shadow-lg rounded-lg overflow-hidden m-4 transform transition-transform hover:scale-105"
               >
-                <figure className="relative">
+                <figure
+                  className="relative"
+                  onClick={() => {
+                    previewProduct(product?.image, product?.price);
+                  }}
+                >
                   <img
                     src={`http://127.0.0.1:8000/assets/images/${product.image}`}
                     alt={product.name}
@@ -154,9 +148,24 @@ const Home = () => {
                     {product.description}
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
-                    <button className="btn btn-accent btn-md px-6 py-3 w-[47%]">
+                    <label
+                      htmlFor="my_modal_2"
+                      className="btn"
+                      onClick={() => handleModalUpdate(product.id!)}
+                    >
                       Edit
-                    </button>
+                    </label>
+                    {/* <input
+                      type="checkbox"
+                      id="my_modal_2"
+                      className="modal-toggle"
+                      checked={openUpdate}
+                      onChange={() => {
+                        setOpenUpdate(!openUpdate);
+                        console.log(openUpdate, product.id);
+                        setEditProductId(product.id!);
+                      }}
+                    /> */}
                     <button
                       className="btn btn-error btn-md px-6 py-3 w-[47%]"
                       onClick={() => handleDelete(product.id!)}
@@ -185,6 +194,50 @@ const Home = () => {
             </button>
           ))}
       </div>
+
+      <input
+        type="checkbox"
+        id="my_modal_2"
+        className="modal-toggle"
+        checked={openUpdate}
+      />
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box min-w-3/4">
+          <EditProductForm
+            callback={(isCreated) => {
+              setOpen(false);
+              if (isCreated) fetchProduct();
+            }}
+            id={editProductId}
+          />
+        </div>
+      </dialog>
+      <dialog id="modalPreview" className="modal">
+        <div className="modal-box p-6 bg-white rounded-lg shadow-lg">
+          <h3 className="font-bold text-2xl text-gray-800 mb-4">
+            Image Preview
+          </h3>
+          {currentProduct && (
+            <div className="flex flex-col items-center">
+              <img
+                src={
+                  typeof currentProduct?.image === "string"
+                    ? `http://127.0.0.1:8000/assets/images/${currentProduct?.image}`
+                    : URL.createObjectURL(currentProduct?.image)
+                }
+                alt="Preview"
+                className="w-full max-w-md h-auto rounded-lg border border-gray-300 shadow-sm"
+              />
+              <small className="font-bold text-lg text-gray-700 mt-4">
+                Rp. {currentProduct?.price.toFixed(2)}
+              </small>
+            </div>
+          )}
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </>
   );
 };
