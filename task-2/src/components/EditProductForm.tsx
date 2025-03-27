@@ -233,6 +233,7 @@ const EditProductForm: React.FC<{
             <legend className="fieldset-legend">Pick a file</legend>
             <input
               type="file"
+              accept="image/*"
               className={
                 "file-input w-full" +
                 (productError?.image && productError?.image.length
