@@ -23,43 +23,48 @@ function InformasiSaldo() {
 
   return (
     <>
-      <section className="flex flex-col justify-center mx-32 ">
-        <div className="flex flex-col justify-center items-center my-16">
-          <h1>
+      <section className="flex flex-col justify-center px-4 sm:px-8 lg:px-32">
+        <div className="flex flex-col justify-center md:items-center my-8 sm:my-12 lg:my-16">
+          <h1 className="text-lg sm:text-xl lg:text-2xl">
             <strong>Informasi Saldo</strong>
           </h1>
-          <p>Nama : {data.name}</p>
-          <p>Account No : {data.accountNo}</p>
-          <p>Partner Reference No : {data.partnerReferenceNo}</p>
+          <p className="text-sm sm:text-base lg:text-lg">Name : {data.name}</p>
+          <p className="text-sm sm:text-base lg:text-lg">
+            Account No : {data.accountNo}
+          </p>
+          <p className="text-sm sm:text-base lg:text-lg">
+            Partner Reference No : {data.partnerReferenceNo}
+          </p>
         </div>
-        <div>
+        <div className="flex">
           <button
             onClick={() => handleButtonState()}
-            className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg xl:btn-xl"
+            className="btn btn-soft btn-md lg:btn-lg xl:btn-xl"
           >
             Show Balance
           </button>
         </div>
+        <div className="divider"></div>
       </section>
       <section>
         {buttonState === "active" &&
           data.accountInfos &&
           data.accountInfos.map((info, index) => (
-            <div key={index} className="mx-32">
-              <div className="my-8">
-                <p>
+            <div key={index} className="px-4 sm:px-8 lg:px-32">
+              <div className="my-4 sm:my-6 lg:my-8">
+                <p className="text-sm sm:text-base lg:text-lg">
                   <strong>Balance Type:</strong> {info.balanceType}
                 </p>
-                <p>
+                <p className="text-sm sm:text-base lg:text-lg">
                   <strong>Status:</strong> {info.status}
                 </p>
-                <p>
+                <p className="text-sm sm:text-base lg:text-lg">
                   <strong>Reg Status Code:</strong>{" "}
                   {info.registrationStatusCode}
                 </p>
               </div>
               <div className="overflow-x-auto">
-                <table className="table">
+                <table className="table table-auto w-full text-sm sm:text-base">
                   <thead>
                     <tr>
                       <th>#</th>
