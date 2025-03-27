@@ -26,9 +26,5 @@ use Illuminate\Support\Facades\Route;
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/logout', [AuthController::class, 'logout']);
-    });
-
-
-    Route::middleware('auth:sanctum','snap-bi')->group(function () {
-        Route::post('/informasi-saldo', [SaldoController::class, 'showSaldo']);
+        Route::post('/informasi-saldo', [SaldoController::class, 'showSaldo'])->middleware('snap-bi');
     });

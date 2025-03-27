@@ -9,11 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller
-{
+class AuthController extends Controller{
 
-    public function register(Request $request)
-    {
+    public function register(Request $request){
         // Validasi input
         $request->validate([
             'name' => 'required|string|max:255',
