@@ -123,7 +123,7 @@ const Home = () => {
         </label>
       </div> */}
       <div
-        className="min-h-screen"
+        className="min-h-screen py-10 px-5"
         style={{
           backgroundImage:
             "url(https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
@@ -142,7 +142,7 @@ const Home = () => {
                 className="card bg-white w-96 shadow-lg rounded-lg overflow-hidden m-4 transform transition-transform hover:scale-105"
               >
                 <figure
-                  className="relative"
+                  className="relative cursor-pointer"
                   onClick={() => {
                     previewProduct(
                       product?.image as string | null,
@@ -150,27 +150,28 @@ const Home = () => {
                     );
                   }}
                 >
-                  {product.image && (
+                  {product.image ? (
                     <img
                       src={`http://127.0.0.1:8000/assets/images/${product.image}`}
                       alt={product.name}
-                      className="w-full h-64 object-cover"
+                      className="w-full h-64 object-cover rounded-t-lg transition-transform duration-300 hover:scale-105"
                     />
-                  )}
-                  {!product.image && (
-                    <div className="w-full h-64 flex justify-center items-center bg-base-100">
-                      <p className="text-primary-content">Image Unavailable</p>
+                  ) : (
+                    <div className="w-full h-64 flex justify-center items-center bg-gray-200 rounded-t-lg">
+                      <p className="text-gray-500 font-semibold">
+                        Image Unavailable
+                      </p>
                     </div>
                   )}
                 </figure>
-                <div className="card-body p-6">
-                  <h1 className="card-title text-lg font-semibold text-gray-800">
+                <div className="card-body p-6 bg-gradient-to-br from-white to-gray-50 rounded-b-lg shadow-inner">
+                  <h1 className="card-title text-lg font-bold text-gray-900">
                     {product.name}
                   </h1>
-                  <p className="text-gray-600 text-sm mt-2 italic">
+                  <p className="text-gray-700 text-sm mt-2">
                     {product.description}
                   </p>
-                  <p className="text-black text-sm mt-2">
+                  <p className="text-primary font-semibold text-lg mt-2 text-end">
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
@@ -178,7 +179,7 @@ const Home = () => {
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
                     <button
-                      className="btn btn-accent btn-md px-6 py-3 w-[47%]"
+                      className="btn btn-outline btn-primary btn-md px-6 py-3 w-[47%] transition-transform duration-300 hover:scale-105"
                       onClick={() => {
                         setEditProductId(product.id!);
                         setOpenUpdate(!openUpdate);
@@ -190,7 +191,7 @@ const Home = () => {
                       Edit
                     </button>
                     <button
-                      className="btn btn-error btn-md px-6 py-3 w-[47%]"
+                      className="btn btn-secondary btn-outline btn-md px-6 py-3 w-[47%] transition-transform duration-300 hover:scale-105"
                       onClick={() => handleDelete(product.id!)}
                     >
                       Delete
