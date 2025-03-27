@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
-import axiosInstance from "../utils/axios";
-import { IPreviewProduct, IProduct } from "../interfaces/product";
-import Swal from "sweetalert2";
 import EditProductForm from "../components/EditProductForm";
+import Swal from "sweetalert2";
+import axiosInstance from "../utils/axios";
 import constants from "../constants";
+import { IPreviewProduct, IProduct } from "../interfaces/product";
 
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -14,6 +14,8 @@ const Home = () => {
   const [currentProduct, setCurrentProduct] = useState<IPreviewProduct | null>(
     null
   );
+  const [open, setOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const fetchProduct = async (page: number = currentPage) => {
     try {
@@ -30,12 +32,19 @@ const Home = () => {
         setTotalPage(res?.data?.last_page);
       }
       return;
-    } catch (error) {
+    } catch (e) {
+      console.log(e);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed fetch product. Please check your internet connection.",
+        icon: "error",
+      });
+
       return;
     }
   };
 
-  const previewProduct = (productImg: string, price: number) => {
+  const previewProduct = (productImg: string | null, price: number) => {
     (
       document?.getElementById("modalPreview") as HTMLDialogElement
     )?.showModal();
@@ -78,22 +87,15 @@ const Home = () => {
     fetchProduct(page);
   };
 
-  const handleModalUpdate = (id: number) => {
-    setOpenUpdate(!openUpdate);
-    setEditProductId(id!);
+  const handleModalUpdate = (isCreated: boolean) => {
+    document.getElementById(constants.UpdateModalId)!.close();
+    if (isCreated) fetchProduct();
+    setOpenUpdate(false);
   };
 
   useEffect(() => {
     fetchProduct();
   }, []);
-
-  const [open, setOpen] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const closeUpdateModal = (isCreated: boolean) => {
-    document.getElementById(constants.UpdateModalId)!.close();
-    if (isCreated) fetchProduct();
-    setOpenUpdate(false);
-  };
 
   return (
     <>
@@ -140,14 +142,24 @@ const Home = () => {
                 <figure
                   className="relative"
                   onClick={() => {
-                    previewProduct(product?.image, product?.price);
+                    previewProduct(
+                      product?.image as string | null,
+                      product?.price
+                    );
                   }}
                 >
-                  <img
-                    src={`http://127.0.0.1:8000/assets/images/${product.image}`}
-                    alt={product.name}
-                    className="w-full h-64 object-cover"
-                  />
+                  {product.image && (
+                    <img
+                      src={`http://127.0.0.1:8000/assets/images/${product.image}`}
+                      alt={product.name}
+                      className="w-full h-64 object-cover"
+                    />
+                  )}
+                  {!product.image && (
+                    <div className="w-full h-64 flex justify-center items-center bg-base-100">
+                      <p className="text-primary-content">Image Unavailable</p>
+                    </div>
+                  )}
                 </figure>
                 <div className="card-body p-6">
                   <h2 className="card-title text-lg font-semibold text-gray-800">
@@ -200,7 +212,7 @@ const Home = () => {
       <dialog id={constants.UpdateModalId} className="modal">
         <div className="modal-box">
           {openUpdate && (
-            <EditProductForm callback={closeUpdateModal} id={editProductId} />
+            <EditProductForm callback={handleModalUpdate} id={editProductId} />
           )}
         </div>
       </dialog>
@@ -211,15 +223,17 @@ const Home = () => {
           </h3>
           {currentProduct && (
             <div className="flex flex-col items-center">
-              <img
-                src={
-                  typeof currentProduct?.image === "string"
-                    ? `http://127.0.0.1:8000/assets/images/${currentProduct?.image}`
-                    : URL.createObjectURL(currentProduct?.image)
-                }
-                alt="Preview"
-                className="w-full max-w-md h-auto rounded-lg border border-gray-300 shadow-sm"
-              />
+              {currentProduct.image && (
+                <img
+                  src={
+                    typeof currentProduct?.image === "string"
+                      ? `http://127.0.0.1:8000/assets/images/${currentProduct?.image}`
+                      : URL.createObjectURL(currentProduct?.image)
+                  }
+                  alt="Preview"
+                  className="w-full max-w-md h-auto rounded-lg border border-gray-300 shadow-sm"
+                />
+              )}
               <small className="font-bold text-lg text-gray-700 mt-4">
                 Rp. {currentProduct?.price.toFixed(2)}
               </small>
