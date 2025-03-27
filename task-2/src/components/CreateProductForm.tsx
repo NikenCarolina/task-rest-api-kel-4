@@ -52,6 +52,10 @@ const CreateProductForm: React.FC<{
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes!",
       });
+      if (createResult.isDismissed) {
+        setSubmitLoading(false);
+        return;
+      }
       if (createResult.isConfirmed) {
         setProductError(null);
         await axiosInstance.post("/products", formData, {
@@ -64,7 +68,7 @@ const CreateProductForm: React.FC<{
           text: "Your product has been created.",
           icon: "success",
         });
-        if (result.isConfirmed) {
+        if (result.isDismissed) {
           setSubmitLoading(false);
           callback(true);
         }
@@ -87,6 +91,7 @@ const CreateProductForm: React.FC<{
       }
     }
   };
+
   return (
     <form onSubmit={CreateProduct}>
       <h2 className="font-bold text-2xl mb-2">Create Product</h2>
@@ -97,7 +102,10 @@ const CreateProductForm: React.FC<{
             <input
               type="text"
               className={
-                "input w-full" + (productError?.name ? " input-error" : "")
+                "input w-full" +
+                (productError?.name && productError?.name.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. Kopi"
               value={product.name}
@@ -118,7 +126,9 @@ const CreateProductForm: React.FC<{
               type="text"
               className={
                 "input w-full" +
-                (productError?.description ? " input-error" : "")
+                (productError?.description && productError?.description.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. Kopi Luwak adalah ..."
               value={product.description}
@@ -138,7 +148,10 @@ const CreateProductForm: React.FC<{
             <input
               type="text"
               className={
-                "input w-full" + (productError?.price ? " input-error" : "")
+                "input w-full" +
+                (productError?.price && productError?.price.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. 5000"
               value={product.price}
@@ -163,7 +176,9 @@ const CreateProductForm: React.FC<{
               type="file"
               className={
                 "file-input w-full" +
-                (productError?.image ? " file-input-error" : "")
+                (productError?.image && productError?.image.length
+                  ? " file-input-error"
+                  : "")
               }
               onChange={handleFileChange}
               ref={fileInputRef}

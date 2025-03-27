@@ -58,6 +58,10 @@ const EditProductForm: React.FC<{
         confirmButtonText: "Yes!",
         target: document.getElementById(constants.UpdateModalId),
       });
+      if (updateResult.isDismissed) {
+        setSubmitLoading(false);
+        return;
+      }
       if (updateResult.isConfirmed) {
         setProductError(null);
         await axiosInstance.post(`/products/${id}`, formData, {
@@ -71,7 +75,7 @@ const EditProductForm: React.FC<{
           icon: "success",
           target: document.getElementById(constants.UpdateModalId),
         });
-        if (result.isConfirmed) {
+        if (result.isDismissed) {
           setSubmitLoading(false);
           callback(true);
         }
@@ -90,7 +94,6 @@ const EditProductForm: React.FC<{
           text: "Failed to delete product",
           icon: "error",
         });
-        console.log(productError);
         setSubmitLoading(false);
       }
     }
@@ -140,7 +143,10 @@ const EditProductForm: React.FC<{
             <input
               type="text"
               className={
-                "input w-full" + (productError?.name ? " input-error" : "")
+                "input w-full" +
+                (productError?.name && productError?.name.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. Kopi"
               value={product?.name}
@@ -161,7 +167,9 @@ const EditProductForm: React.FC<{
               type="text"
               className={
                 "input w-full" +
-                (productError?.description ? " input-error" : "")
+                (productError?.description && productError?.description.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. Kopi Luwak adalah ..."
               value={product?.description}
@@ -181,7 +189,10 @@ const EditProductForm: React.FC<{
             <input
               type="text"
               className={
-                "input w-full" + (productError?.price ? " input-error" : "")
+                "input w-full" +
+                (productError?.price && productError?.price.length
+                  ? " input-error"
+                  : "")
               }
               placeholder="e.g. 5000"
               value={product?.price}
@@ -206,7 +217,9 @@ const EditProductForm: React.FC<{
               type="file"
               className={
                 "file-input w-full" +
-                (productError?.image ? " file-input-error" : "")
+                (productError?.image && productError?.image.length
+                  ? " file-input-error"
+                  : "")
               }
               onChange={handleFileChange}
               ref={fileInputRef}
