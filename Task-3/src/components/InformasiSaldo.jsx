@@ -4,6 +4,7 @@ import getBalanceInquiry from "../services/api";
 
 function InformasiSaldo() {
   const [data, setData] = useState("");
+  const [buttonState, setButtonState] = useState("inactive");
 
   useEffect(() => {
     getBalanceInquiry()
@@ -14,23 +15,49 @@ function InformasiSaldo() {
       .catch((error) => console.error("Error:", error));
   }, []);
 
+  const handleButtonState = () => {
+    setButtonState((prevState) =>
+      prevState === "active" ? "inactive" : "active"
+    );
+  };
+
   return (
     <>
-      <section className="flex flex-col justify-center items-center mx-64 my-16">
-        <h1 className="self-center">
-          <strong>Informasi Saldo</strong>
-        </h1>
-        <p>Nama : {data.name}</p>
-        <p>Account No : {data.accountNo}</p>
-        <p>Partner Reference No : {data.partnerReferenceNo}</p>
+      <section className="flex flex-col justify-center mx-32 ">
+        <div className="flex flex-col justify-center items-center my-16">
+          <h1>
+            <strong>Informasi Saldo</strong>
+          </h1>
+          <p>Nama : {data.name}</p>
+          <p>Account No : {data.accountNo}</p>
+          <p>Partner Reference No : {data.partnerReferenceNo}</p>
+        </div>
+        <div>
+          <button
+            onClick={() => handleButtonState()}
+            className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg xl:btn-xl"
+          >
+            Show Balance
+          </button>
+        </div>
       </section>
       <section>
-        {data.accountInfos &&
+        {buttonState === "active" &&
+          data.accountInfos &&
           data.accountInfos.map((info, index) => (
-            <div key={index} className="mb-8">
-              <p>Balance Type: {info.balanceType}</p>
-              <p>Status: {info.status}</p>
-              <p>Reg Status Code: {info.registrationStatusCode}</p>
+            <div key={index} className="mx-32">
+              <div className="my-8">
+                <p>
+                  <strong>Balance Type:</strong> {info.balanceType}
+                </p>
+                <p>
+                  <strong>Status:</strong> {info.status}
+                </p>
+                <p>
+                  <strong>Reg Status Code:</strong>{" "}
+                  {info.registrationStatusCode}
+                </p>
+              </div>
               <div className="overflow-x-auto">
                 <table className="table">
                   <thead>
