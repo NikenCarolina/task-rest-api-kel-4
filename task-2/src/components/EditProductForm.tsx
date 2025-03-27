@@ -234,9 +234,9 @@ const EditProductForm: React.FC<{
           </fieldset>
         </div>
         <div className="divider divider-horizontal"></div>
-        <div className="card bg-base-300 rounded-box grid grow place-items-center">
-          {preview && <img src={preview} alt="Preview"></img>}
-          {!preview && <p>No Image Selected</p>}
+        <div className="card bg-base-300 rounded-box grid grow place-items-center justify-items-center">
+          {product.image && preview && <img src={preview} alt="Preview"></img>}
+          {!product.image && <p className="text-center">No Image Selected</p>}
         </div>
       </div>
       <div className="flex justify-end gap-2">
