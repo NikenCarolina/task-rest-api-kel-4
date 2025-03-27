@@ -192,6 +192,7 @@ const CreateProductForm: React.FC<{
                   ? " file-input-error"
                   : "")
               }
+              accept="image/*"
               onChange={handleFileChange}
               ref={fileInputRef}
               disabled={submitLoading}
