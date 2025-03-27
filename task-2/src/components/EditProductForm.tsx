@@ -100,9 +100,9 @@ const EditProductForm: React.FC<{
           description: e.response?.data.errors.description ?? [],
           image: e.response?.data.errors.image ?? [],
         });
-        Swal.fire({
+        const result = await Swal.fire({
           title: "Error!",
-          text: "Failed to delete product",
+          text: "Failed to edit product",
           icon: "error",
           target: document.getElementById(constants.UpdateModalId),
           scrollbarPadding: false,
@@ -126,18 +126,23 @@ const EditProductForm: React.FC<{
       return;
     } catch (e) {
       if (e instanceof AxiosError) {
-        Swal.fire({
+        const result = await Swal.fire({
           title: "Error!",
           text: "Failed fetch product. Please check your internet connection.",
           icon: "error",
+          target: document.getElementById(constants.UpdateModalId),
+          scrollbarPadding: false,
         });
+        if (result.isConfirmed || result.isDismissed) {
+          callback(false);
+        }
       }
     }
   };
 
   useEffect(() => {
-    getProductById();
-  }, []);
+    if (id !== null) getProductById();
+  }, [id]);
 
   if (loading)
     return (
