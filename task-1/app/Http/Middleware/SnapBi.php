@@ -26,7 +26,7 @@ class SnapBi
                 return response()->json([
                     'status' => 'error',
                     'message' => "Invalid header: $key"
-                ], 400);
+                ], 503);
             }
         }
 
