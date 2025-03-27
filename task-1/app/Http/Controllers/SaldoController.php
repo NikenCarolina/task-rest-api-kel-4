@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class SaldoController extends Controller
-{
+class SaldoController extends Controller{
+    
     public function showSaldo()
     {
         $user = Auth::user();
