@@ -8,14 +8,14 @@ const CreateProductForm: React.FC<{
   callback: (isCreated: boolean) => void;
 }> = ({ callback }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<IProduct>({
     name: "",
     price: 0,
     description: "",
     image: null,
   });
-  const [preview, setPreview] = useState<string | null>(null);
-
   const [productError, setProductError] = useState<{
     name: string[];
     price: string[];
@@ -33,6 +33,7 @@ const CreateProductForm: React.FC<{
 
   const CreateProduct = async (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitLoading(true);
 
     const formData = new FormData();
     formData.append("name", product.name);
@@ -64,6 +65,7 @@ const CreateProductForm: React.FC<{
           icon: "success",
         });
         if (result.isConfirmed) {
+          setSubmitLoading(false);
           callback(true);
         }
       }
@@ -81,6 +83,7 @@ const CreateProductForm: React.FC<{
           text: "Failed to create product",
           icon: "error",
         });
+        setSubmitLoading(false);
       }
     }
   };
@@ -93,12 +96,15 @@ const CreateProductForm: React.FC<{
             <legend className="fieldset-legend">Product Name</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" + (productError?.name ? " input-error" : "")
+              }
               placeholder="e.g. Kopi"
               value={product.name}
               onChange={(e) =>
                 setProduct((prev) => ({ ...prev, name: e.target.value }))
               }
+              disabled={submitLoading}
             />
             {productError?.name && (
               <p className="fieldset-label text-error">
@@ -110,12 +116,16 @@ const CreateProductForm: React.FC<{
             <legend className="fieldset-legend">Description</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" +
+                (productError?.description ? " input-error" : "")
+              }
               placeholder="e.g. Kopi Luwak adalah ..."
               value={product.description}
               onChange={(e) =>
                 setProduct((prev) => ({ ...prev, description: e.target.value }))
               }
+              disabled={submitLoading}
             />
             {productError?.description && (
               <p className="fieldset-label text-error">
@@ -127,7 +137,9 @@ const CreateProductForm: React.FC<{
             <legend className="fieldset-legend">Price</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" + (productError?.price ? " input-error" : "")
+              }
               placeholder="e.g. 5000"
               value={product.price}
               onChange={(e) => {
@@ -137,6 +149,7 @@ const CreateProductForm: React.FC<{
                   price: Number(e.target.value),
                 }));
               }}
+              disabled={submitLoading}
             />
             {productError?.price && (
               <p className="fieldset-label text-error">
@@ -148,9 +161,13 @@ const CreateProductForm: React.FC<{
             <legend className="fieldset-legend">Pick a file</legend>
             <input
               type="file"
-              className="file-input w-full"
+              className={
+                "file-input w-full" +
+                (productError?.image ? " file-input-error" : "")
+              }
               onChange={handleFileChange}
               ref={fileInputRef}
+              disabled={submitLoading}
             />
             <label className="fieldset-label">Max size 2MB</label>
             {productError?.image && (
@@ -167,8 +184,15 @@ const CreateProductForm: React.FC<{
         </div>
       </div>
       <div className="flex justify-end gap-2">
-        <button className="btn btn-primary" type="submit">
-          Add Product
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={submitLoading}
+        >
+          {!submitLoading && "Add"}
+          {submitLoading && (
+            <span className="loading loading-spinner loading-sm"></span>
+          )}
         </button>
         <button
           className="btn"

@@ -3,21 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import { IProduct } from "../interfaces/product";
 import Swal from "sweetalert2";
 import axiosInstance from "../utils/axios";
-import { HttpResponse, IHttpResponse } from "../interfaces/response";
+import { IHttpResponse } from "../interfaces/response";
+import constants from "../constants";
 
 const EditProductForm: React.FC<{
   callback: (isCreated: boolean) => void;
-  id: number;
+  id: number | null;
 }> = ({ callback, id }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<IProduct>({
     name: "",
     price: 0,
     description: "",
     image: null,
   });
-  const [preview, setPreview] = useState<string | null>(null);
-
   const [productError, setProductError] = useState<{
     name: string[];
     price: string[];
@@ -35,6 +37,7 @@ const EditProductForm: React.FC<{
 
   const UpdateProduct = async (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitLoading(true);
 
     const formData = new FormData();
     formData.append("name", product.name);
@@ -53,10 +56,11 @@ const EditProductForm: React.FC<{
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes!",
+        target: document.getElementById(constants.UpdateModalId),
       });
       if (updateResult.isConfirmed) {
         setProductError(null);
-        await axiosInstance.post("/products", formData, {
+        await axiosInstance.post(`/products/${id}`, formData, {
           headers: {
             contentType: "multipart/form-data",
           },
@@ -65,8 +69,10 @@ const EditProductForm: React.FC<{
           title: "Updated!",
           text: "Your product has been created.",
           icon: "success",
+          target: document.getElementById(constants.UpdateModalId),
         });
         if (result.isConfirmed) {
+          setSubmitLoading(false);
           callback(true);
         }
       }
@@ -84,16 +90,23 @@ const EditProductForm: React.FC<{
           text: "Failed to delete product",
           icon: "error",
         });
+        console.log(productError);
+        setSubmitLoading(false);
       }
     }
   };
 
   const getProductById = async () => {
     try {
-      const data: IHttpResponse<IProduct> = await axiosInstance.get(
-        `/products/${id}`
-      );
-      if (data.data) setProduct(data.data);
+      if (id === null) return;
+      const res = await axiosInstance.get(`/products/${id}`);
+
+      const data: IHttpResponse<IProduct> = res.data;
+      if (data.data !== undefined) {
+        setProduct(data.data);
+        setPreview((constants.AssetsUrl + data.data.image) as string);
+      }
+      setLoading(false);
       return;
     } catch (e) {
       if (e instanceof AxiosError) {
@@ -103,28 +116,38 @@ const EditProductForm: React.FC<{
           icon: "error",
         });
       }
-      return;
     }
   };
 
   useEffect(() => {
     getProductById();
   }, []);
+
+  if (loading)
+    return (
+      <div className="flex justify-center">
+        <span className="loading loading-spinner loading-sm"></span>
+      </div>
+    );
+
   return (
     <form onSubmit={UpdateProduct}>
-      <h2 className="font-bold text-2xl mb-2">Updated Product</h2>
+      <h2 className="font-bold text-2xl mb-2">Edit Product</h2>
       <div className="flex w-full mb-3">
-        <div className="card bg-base-300 rounded-box grid grow place-items-center p-6">
+        <div className="card bg-base-300 rounded-box grid grow place-items-center p-6 min-w-1/2">
           <fieldset className="fieldset w-full">
             <legend className="fieldset-legend">Product Name</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" + (productError?.name ? " input-error" : "")
+              }
               placeholder="e.g. Kopi"
-              value={product.name}
+              value={product?.name}
               onChange={(e) =>
                 setProduct((prev) => ({ ...prev, name: e.target.value }))
               }
+              disabled={submitLoading}
             />
             {productError?.name && (
               <p className="fieldset-label text-error">
@@ -136,12 +159,16 @@ const EditProductForm: React.FC<{
             <legend className="fieldset-legend">Description</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" +
+                (productError?.description ? " input-error" : "")
+              }
               placeholder="e.g. Kopi Luwak adalah ..."
-              value={product.description}
+              value={product?.description}
               onChange={(e) =>
                 setProduct((prev) => ({ ...prev, description: e.target.value }))
               }
+              disabled={submitLoading}
             />
             {productError?.description && (
               <p className="fieldset-label text-error">
@@ -153,9 +180,11 @@ const EditProductForm: React.FC<{
             <legend className="fieldset-legend">Price</legend>
             <input
               type="text"
-              className="input w-full"
+              className={
+                "input w-full" + (productError?.price ? " input-error" : "")
+              }
               placeholder="e.g. 5000"
-              value={product.price}
+              value={product?.price}
               onChange={(e) => {
                 if (isNaN(Number(e.target.value))) return;
                 setProduct((prev) => ({
@@ -163,6 +192,7 @@ const EditProductForm: React.FC<{
                   price: Number(e.target.value),
                 }));
               }}
+              disabled={submitLoading}
             />
             {productError?.price && (
               <p className="fieldset-label text-error">
@@ -174,9 +204,13 @@ const EditProductForm: React.FC<{
             <legend className="fieldset-legend">Pick a file</legend>
             <input
               type="file"
-              className="file-input w-full"
+              className={
+                "file-input w-full" +
+                (productError?.image ? " file-input-error" : "")
+              }
               onChange={handleFileChange}
               ref={fileInputRef}
+              disabled={submitLoading}
             />
             <label className="fieldset-label">Max size 2MB</label>
             {productError?.image && (
@@ -193,8 +227,15 @@ const EditProductForm: React.FC<{
         </div>
       </div>
       <div className="flex justify-end gap-2">
-        <button className="btn btn-primary" type="submit">
-          Add Product
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={submitLoading}
+        >
+          {!submitLoading && "Edit"}
+          {submitLoading && (
+            <span className="loading loading-spinner loading-sm"></span>
+          )}
         </button>
         <button
           className="btn"
