@@ -14,7 +14,7 @@ interface IProductWithslide extends IProduct {
 }
 
 interface IPreviewProduct {
-  image: string;
+  image: string | null;
   price: number;
 }
 
