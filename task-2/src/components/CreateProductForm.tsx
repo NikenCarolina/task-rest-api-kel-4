@@ -68,8 +68,17 @@ const CreateProductForm: React.FC<{
           text: "Your product has been created.",
           icon: "success",
         });
-        if (result.isDismissed) {
+        if (result.isDismissed || result.isConfirmed) {
           setSubmitLoading(false);
+          setProduct({
+            name: "",
+            price: 0,
+            description: "",
+            image: null,
+          });
+          setPreview(null);
+          setProductError(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
           callback(true);
         }
       }
@@ -96,7 +105,7 @@ const CreateProductForm: React.FC<{
     <form onSubmit={CreateProduct}>
       <h2 className="font-bold text-2xl mb-2">Create Product</h2>
       <div className="flex w-full mb-3">
-        <div className="card bg-base-300 rounded-box grid grow place-items-center p-6">
+        <div className="card bg-base-300 rounded-box grid grow place-items-center p-6 min-w-1/2 max-w-1/2">
           <fieldset className="fieldset w-full">
             <legend className="fieldset-legend">Product Name</legend>
             <input
