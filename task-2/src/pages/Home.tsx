@@ -9,6 +9,7 @@ import {
   IProduct,
   IProductWithslide,
 } from "../interfaces/product";
+import { AxiosError } from "axios";
 
 const Home = () => {
   const [products, setProducts] = useState<IProductWithslide[]>([]);
@@ -61,7 +62,7 @@ const Home = () => {
 
   const handleDelete = async (productId: number) => {
     try {
-      Swal.fire({
+      const result = await Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
         icon: "warning",
@@ -69,19 +70,33 @@ const Home = () => {
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          await axiosInstance.delete("/products/" + productId);
-          fetchProduct(currentPage);
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your file has been deleted.",
-            icon: "success",
-          });
-        }
       });
+
+      if (result?.isConfirmed) {
+        await axiosInstance.delete("/products/" + productId);
+        fetchProduct(currentPage);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
     } catch (error) {
-      console.log("🚀 ~ handleDelete ~ error:", error);
+      if (error instanceof AxiosError && error.status === 404) {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to delete product, product not found",
+          icon: "error",
+          scrollbarPadding: false,
+        });
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to delete product",
+          icon: "error",
+          scrollbarPadding: false,
+        });
+      }
     }
   };
 
@@ -162,8 +177,8 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="container-lg from-gray-100 to-gray-200 rounded-lg shadow-inner bg-gradient-to-b pb-10">
-          <div className="w-full flex justify-end p-5">
+        <div className="container-lg from-gray-100 to-gray-200 rounded-lg shadow-inner bg-gradient-to-b pb-10 pt-5">
+          <div className="w-full flex justify-end p-10 pb-0">
             <label
               htmlFor={constants.CreateModalId}
               className="btn m-3 right-0"
