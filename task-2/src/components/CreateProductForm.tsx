@@ -51,6 +51,7 @@ const CreateProductForm: React.FC<{
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes!",
+        scrollbarPadding: false,
       });
       if (createResult.isDismissed) {
         setSubmitLoading(false);
@@ -67,6 +68,7 @@ const CreateProductForm: React.FC<{
           title: "Create!",
           text: "Your product has been created.",
           icon: "success",
+          scrollbarPadding: false,
         });
         if (result.isDismissed || result.isConfirmed) {
           setSubmitLoading(false);
@@ -95,6 +97,7 @@ const CreateProductForm: React.FC<{
           title: "Error!",
           text: "Failed to create product",
           icon: "error",
+          scrollbarPadding: false,
         });
         setSubmitLoading(false);
       }
