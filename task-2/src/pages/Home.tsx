@@ -4,12 +4,13 @@ import axiosInstance from "../utils/axios";
 import { IPreviewProduct, IProduct } from "../interfaces/product";
 import Swal from "sweetalert2";
 import EditProductForm from "../components/EditProductForm";
+import constants from "../constants";
 
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [editProductId, setEditProductId] = useState(-1);
+  const [editProductId, setEditProductId] = useState<number | null>(null);
   const [currentProduct, setCurrentProduct] = useState<IPreviewProduct | null>(
     null
   );
@@ -88,22 +89,30 @@ const Home = () => {
 
   const [open, setOpen] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
+  const closeUpdateModal = (isCreated: boolean) => {
+    document.getElementById(constants.UpdateModalId)!.close();
+    if (isCreated) fetchProduct();
+    setOpenUpdate(false);
+  };
 
   return (
     <>
-      <label htmlFor="my_modal_1" className="btn absolute m-3 right-0">
+      <label
+        htmlFor={constants.CreateModalId}
+        className="btn absolute m-3 right-0"
+      >
         Create Product
       </label>
 
       <input
         type="checkbox"
-        id="my_modal_1"
+        id={constants.CreateModalId}
         className="modal-toggle"
         checked={open}
         onChange={() => setOpen(!open)}
       />
 
-      <dialog id="my_modal_1" className="modal">
+      <dialog id={constants.CreateModalId} className="modal">
         <div className="modal-box min-w-3/4">
           <CreateProductForm
             callback={(isCreated) => {
@@ -148,24 +157,18 @@ const Home = () => {
                     {product.description}
                   </p>
                   <div className="card-actions mt-4 flex justify-between">
-                    <label
-                      htmlFor="my_modal_2"
+                    <button
                       className="btn"
-                      onClick={() => handleModalUpdate(product.id!)}
+                      onClick={() => {
+                        setEditProductId(product.id!);
+                        setOpenUpdate(!openUpdate);
+                        document
+                          .getElementById(constants.UpdateModalId)!
+                          .showModal();
+                      }}
                     >
                       Edit
-                    </label>
-                    {/* <input
-                      type="checkbox"
-                      id="my_modal_2"
-                      className="modal-toggle"
-                      checked={openUpdate}
-                      onChange={() => {
-                        setOpenUpdate(!openUpdate);
-                        console.log(openUpdate, product.id);
-                        setEditProductId(product.id!);
-                      }}
-                    /> */}
+                    </button>
                     <button
                       className="btn btn-error btn-md px-6 py-3 w-[47%]"
                       onClick={() => handleDelete(product.id!)}
@@ -194,22 +197,11 @@ const Home = () => {
             </button>
           ))}
       </div>
-
-      <input
-        type="checkbox"
-        id="my_modal_2"
-        className="modal-toggle"
-        checked={openUpdate}
-      />
-      <dialog id="my_modal_2" className="modal">
-        <div className="modal-box min-w-3/4">
-          <EditProductForm
-            callback={(isCreated) => {
-              setOpen(false);
-              if (isCreated) fetchProduct();
-            }}
-            id={editProductId}
-          />
+      <dialog id={constants.UpdateModalId} className="modal">
+        <div className="modal-box">
+          {openUpdate && (
+            <EditProductForm callback={closeUpdateModal} id={editProductId} />
+          )}
         </div>
       </dialog>
       <dialog id="modalPreview" className="modal">
